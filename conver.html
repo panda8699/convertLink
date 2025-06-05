@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Thay thế đoạn token trong URL</title>
+  <title>Thay thế token trong URL</title>
   <style>
     body { font-family: Arial; padding: 20px; max-width: 960px; margin: auto; }
     input, textarea { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 15px; }
@@ -17,20 +17,20 @@
 </head>
 <body>
 
-  <h2>🔁 Thay thế đoạn token trong URL</h2>
+  <h2>🔁 Công cụ thay thế token trong URL</h2>
 
-  <label>🔗 URL nguồn (Input 1):</label>
+  <label>🔗 Token 2TB:</label>
   <input type="text" id="input1" placeholder="Dán URL chứa token cần lấy">
 
-  <label>🎯 URL đích (Input 2):</label>
-  <input type="text" id="input2" placeholder="Dán URL đích cần thay thế đoạn token">
+  <label>🎯 Token 30T ULTRA:</label>
+  <input type="text" id="input2" placeholder="Dán URL đích cần thay thế">
 
-  <button onclick="process()">Thay thế</button>
+  <button onclick="process()">Chuyển đổi</button>
 
-  <label>📦 Token trích xuất từ Input 1:</label>
+  <label>📦 Token trích xuất từ 2TB:</label>
   <div id="codeExtracted">(Chưa có dữ liệu)</div>
 
-  <label>✅ Kết quả sau khi thay thế:</label>
+  <label>✅ Kết quả sau thay thế:</label>
   <textarea id="result" rows="6" readonly></textarea>
 
   <button id="copyBtn" onclick="copyToClipboard()">📋 Copy kết quả</button>
@@ -58,18 +58,21 @@
 
       if (startIdx !== -1 && endIdx !== -1) {
         const raw = decodedUrl.substring(startIdx, endIdx + endMarker.length);
-        return encodeURL(raw);
+        return encodeURIComponent(raw);
       }
       return null;
     }
 
     function process() {
-      const url1 = document.getElementById("input1").value;
-      const url2 = document.getElementById("input2").value;
+      let input1 = document.getElementById("input1").value;
+      let input2 = document.getElementById("input2").value;
       const resultBox = document.getElementById("result");
       const codeBox = document.getElementById("codeExtracted");
 
-      const decoded = decodeURL(url1);
+      input1 = input1.replace('g1.2tb', 'g1.5tb');
+      input2 = input2.replace('%2C0%2C', '%2C1%2C');
+
+      const decoded = decodeURL(input1);
       const encodedToken = extractToken(decoded);
 
       if (!encodedToken) {
@@ -79,8 +82,7 @@
       }
 
       codeBox.textContent = encodedToken;
-
-      const replacedUrl = url2.replace(/%3D%3D%22.*?subs%3Acom/, encodedToken);
+      const replacedUrl = input2.replace(/%3D%3D%22.*?subs%3Acom/, encodedToken);
       resultBox.value = replacedUrl;
     }
 
