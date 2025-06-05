@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thay thế đoạn token trong URL</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 960px; margin: auto; }
+    input, textarea { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 15px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-top: 5px; margin-right: 10px; }
+    label { font-weight: bold; margin-top: 10px; display: block; }
+    #codeExtracted { background: #f9f9f9; padding: 10px; border: 1px solid #ccc; word-break: break-word; }
+    #copyBtn { background-color: #4CAF50; color: white; border: none; }
+    #copyBtn:hover { background-color: #45a049; }
+    #openBtn { background-color: #2196F3; color: white; border: none; }
+    #openBtn:hover { background-color: #0b7dda; }
+  </style>
+</head>
+<body>
+
+  <h2>🔁 Thay thế đoạn token trong URL</h2>
+
+  <label>🔗 URL nguồn (Input 1):</label>
+  <input type="text" id="input1" placeholder="Dán URL chứa token cần lấy">
+
+  <label>🎯 URL đích (Input 2):</label>
+  <input type="text" id="input2" placeholder="Dán URL đích cần thay thế đoạn token">
+
+  <button onclick="process()">Thay thế</button>
+
+  <label>📦 Token trích xuất từ Input 1:</label>
+  <div id="codeExtracted">(Chưa có dữ liệu)</div>
+
+  <label>✅ Kết quả sau khi thay thế:</label>
+  <textarea id="result" rows="6" readonly></textarea>
+
+  <button id="copyBtn" onclick="copyToClipboard()">📋 Copy kết quả</button>
+  <button id="openBtn" onclick="openInNewTab()">🆕 Mở trong tab mới</button>
+
+  <script>
+    function decodeURL(str) {
+      try {
+        return decodeURIComponent(str);
+      } catch (e) {
+        return str;
+      }
+    }
+
+    function encodeURL(str) {
+      return encodeURIComponent(str);
+    }
+
+    function extractToken(decodedUrl) {
+      const startMarker = '==';
+      const endMarker = 'subs:com';
+
+      const startIdx = decodedUrl.indexOf(startMarker);
+      const endIdx = decodedUrl.indexOf(endMarker, startIdx);
+
+      if (startIdx !== -1 && endIdx !== -1) {
+        const raw = decodedUrl.substring(startIdx, endIdx + endMarker.length);
+        return encodeURL(raw);
+      }
+      return null;
+    }
+
+    function process() {
+      const url1 = document.getElementById("input1").value;
+      const url2 = document.getElementById("input2").value;
+      const resultBox = document.getElementById("result");
+      const codeBox = document.getElementById("codeExtracted");
+
+      const decoded = decodeURL(url1);
+      const encodedToken = extractToken(decoded);
+
+      if (!encodedToken) {
+        codeBox.textContent = "❌ Không tìm thấy đoạn token phù hợp.";
+        resultBox.value = "";
+        return;
+      }
+
+      codeBox.textContent = encodedToken;
+
+      const replacedUrl = url2.replace(/%3D%3D%22.*?subs%3Acom/, encodedToken);
+      resultBox.value = replacedUrl;
+    }
+
+    function copyToClipboard() {
+      const resultText = document.getElementById("result");
+      resultText.select();
+      resultText.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(resultText.value).then(() => {
+        alert("✅ Đã copy kết quả vào clipboard!");
+      }, () => {
+        alert("❌ Không thể copy. Trình duyệt không hỗ trợ.");
+      });
+    }
+
+    function openInNewTab() {
+      const url = document.getElementById("result").value;
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        alert("⚠️ Không có URL để mở.");
+      }
+    }
+  </script>
+
+</body>
+</html>
